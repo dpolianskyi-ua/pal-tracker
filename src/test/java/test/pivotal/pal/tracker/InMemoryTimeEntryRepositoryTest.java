@@ -12,7 +12,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class InMemoryTimeEntryRepositoryTest {
     @Test
-    public void create() throws Exception {
+    public void create_whenEntryIsNull() {
+        InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
+
+        TimeEntry createdTimeEntry = repo.create(null);
+
+        assertThat(createdTimeEntry).isNull();
+    }
+
+    @Test
+    public void create() {
         InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
 
         long projectId = 123L;
@@ -28,7 +37,15 @@ public class InMemoryTimeEntryRepositoryTest {
     }
 
     @Test
-    public void find() throws Exception {
+    public void find_whenEntryIsNull() {
+        InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
+
+        TimeEntry readEntry = repo.find(null);
+        assertThat(readEntry).isNull();
+    }
+
+    @Test
+    public void find() {
         InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
 
         long projectId = 123L;
@@ -42,7 +59,7 @@ public class InMemoryTimeEntryRepositoryTest {
     }
 
     @Test
-    public void list() throws Exception {
+    public void list() {
         InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
         repo.create(new TimeEntry(123L, 456L, LocalDate.parse("2017-01-08"), 8));
         repo.create(new TimeEntry(789L, 654L, LocalDate.parse("2017-01-07"), 4));
@@ -55,7 +72,32 @@ public class InMemoryTimeEntryRepositoryTest {
     }
 
     @Test
-    public void update() throws Exception {
+    public void update_whenIdIsNull() {
+        InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
+        TimeEntry created = repo.create(new TimeEntry(123L, 456L, LocalDate.parse("2017-01-08"), 8));
+
+        TimeEntry updatedEntry = repo.update(
+                null,
+                new TimeEntry());
+
+        assertThat(updatedEntry).isNull();
+    }
+
+    @Test
+    public void update_whenEntryIsNull() {
+        InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
+        TimeEntry created = repo.create(new TimeEntry(123L, 456L, LocalDate.parse("2017-01-08"), 8));
+
+
+        TimeEntry updatedEntry = repo.update(
+                created.getId(),
+                null);
+
+        assertThat(updatedEntry).isNull();
+    }
+
+    @Test
+    public void update() {
         InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
         TimeEntry created = repo.create(new TimeEntry(123L, 456L, LocalDate.parse("2017-01-08"), 8));
 
@@ -69,7 +111,19 @@ public class InMemoryTimeEntryRepositoryTest {
     }
 
     @Test
-    public void delete() throws Exception {
+    public void delete_whenIdIsNull() {
+        InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
+
+        long projectId = 123L;
+        long userId = 456L;
+        TimeEntry created = repo.create(new TimeEntry(projectId, userId, LocalDate.parse("2017-01-08"), 8));
+
+        repo.delete(null);
+        assertThat(repo.list()).hasSize(1);
+    }
+
+    @Test
+    public void delete() {
         InMemoryTimeEntryRepository repo = new InMemoryTimeEntryRepository();
 
         long projectId = 123L;
