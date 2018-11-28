@@ -25,55 +25,65 @@ pipeline {
         skipDefaultCheckout true
     }
 
-    stages{
+    stages {
         stage('Initialize ENV') {
-            deleteDir()
-            env.PATH = "/home/jenkins/.gem/bin:${env.PATH}"
+            steps {
+                deleteDir()
+                env.PATH = "/home/jenkins/.gem/bin:${env.PATH}"
+            }
         }
 
         stage('Checkout') {
-            checkout scm
-            getCommitRevision()
-            currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
+            steps {
+                checkout scm
+                getCommitRevision()
+                currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
 
-            stash 'sourceCode'
+                stash 'sourceCode'
+            }
         }
 
         stage('Assemble') {
-            echo 'Reverting source code to latest branch ' + env.GITHASH + ' revision'
-            sh 'git reset --hard ' + env.GITHASH
+            steps {
+                echo 'Reverting source code to latest branch ' + env.GITHASH + ' revision'
+                sh 'git reset --hard ' + env.GITHASH
 
-            //Make all scripts executable
-            sh 'chmod -R +x ./scripts'
+                //Make all scripts executable
+                sh 'chmod -R +x ./scripts'
 
-            sh 'java -version'
+                sh 'java -version'
 
-            sh "./scripts/ci_assemble.sh"
+                sh "./scripts/ci_assemble.sh"
 
-            sh "./scripts/migrate-database.sh"
+                sh "./scripts/migrate-database.sh"
 
-            stash 'assembledSourceCode'
+                stash 'assembledSourceCode'
+            }
         }
 
         stage('Testing') {
-            // run goal for testing
+            steps {
+                // run goal for testing
 
-            stash 'assembledSourceCodeForTesting'
+                stash 'assembledSourceCodeForTesting'
+            }
         }
 
         stage('Deployment') {
-            deleteDir()
+            steps {
+                deleteDir()
 
-            def envToDeploy = 'none'
+                def envToDeploy = 'none'
 
-            if (env.BRANCH_NAME == 'master') {
-                envToDeploy = 'SET ENV TO DEPLOY'
-                stage('Deploying to SET ENV TO DEPLOY') {
-                    deployApps(envToDeploy, 'pal-tracker')
-                    triggerContinuousDeliveryPipeline()
+                if (env.BRANCH_NAME == 'master') {
+                    envToDeploy = 'SET ENV TO DEPLOY'
+                    stage('Deploying to SET ENV TO DEPLOY') {
+                        deployApps(envToDeploy, 'pal-tracker')
+                        triggerContinuousDeliveryPipeline()
+                    }
+                } else {
+
                 }
-            } else {
-
             }
         }
     }
