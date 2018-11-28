@@ -25,7 +25,7 @@ pipeline {
         skipDefaultCheckout true
     }
 
-    node('ci-pal-tracker') {
+    stages{
         stage('Initialize ENV') {
             deleteDir()
             env.PATH = "/home/jenkins/.gem/bin:${env.PATH}"
@@ -54,37 +54,29 @@ pipeline {
 
             stash 'assembledSourceCode'
         }
-    }
 
-    checkpoint 'Assemble Complete'
-
-    node('ci-pal-tracker') {
         stage('Testing') {
             // run goal for testing
 
             stash 'assembledSourceCodeForTesting'
         }
-    }
 
-    checkpoint 'Testing Complete'
+        stage('Deployment') {
+            deleteDir()
 
-    node('ci-pal-tracker') {
-        deleteDir()
+            def envToDeploy = 'none'
 
-        def envToDeploy = 'none'
+            if (env.BRANCH_NAME == 'master') {
+                envToDeploy = 'SET ENV TO DEPLOY'
+                stage('Deploying to SET ENV TO DEPLOY') {
+                    deployApps(envToDeploy, 'pal-tracker')
+                    triggerContinuousDeliveryPipeline()
+                }
+            } else {
 
-        if (env.BRANCH_NAME == 'master') {
-            envToDeploy = 'SET ENV TO DEPLOY'
-            stage('Deploying to SET ENV TO DEPLOY') {
-                deployApps(envToDeploy, 'pal-tracker')
-                triggerContinuousDeliveryPipeline()
             }
-        } else {
-
         }
     }
-
-    checkpoint 'Deployment Complete'
 }
 
 def deployApps(env, app) {
