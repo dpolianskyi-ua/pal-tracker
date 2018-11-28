@@ -34,6 +34,16 @@ pipeline {
                 }
             }
 
+            stage('Prepare ENV') {
+                steps('Create DB') {
+                    mysql -uroot < databases/tracker/create_databases.sql
+                }
+
+                steps('Flyway migration') {
+                    sh 'echo "Migrate"'
+                }
+            }
+
             stage('Test') {
                 steps('Run tests') {
                     sh './gradlew clean build'
