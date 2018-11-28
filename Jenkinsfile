@@ -1,4 +1,6 @@
 #!groovy
+import groovy.json.JsonSlurperClassic
+
 if (env.BRANCH_NAME == 'master') {
     properties([[$class  : 'BuildDiscarderProperty',
                  strategy: [$class               : 'LogRotator',
