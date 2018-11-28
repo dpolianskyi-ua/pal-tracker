@@ -51,8 +51,8 @@ pipeline {
 
         stage('Assemble') {
             steps {
-                echo 'Reverting source code to latest branch ' + env.GITHASH + ' revision'
-                sh 'git reset --hard ' + env.GITHASH
+//                echo 'Reverting source code to latest branch ' + env.GITHASH + ' revision'
+//                sh 'git reset --hard ' + env.GITHASH
 
                 //Make all scripts executable
                 sh 'chmod -R +x ./scripts'
