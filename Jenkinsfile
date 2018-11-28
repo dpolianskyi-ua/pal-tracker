@@ -31,14 +31,10 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Preparation') {
+        stage('Create DB + Flyway') {
             steps {
-                step('Create DB') {
-                    sh 'mysql -uroot < databases/tracker/create_databases.sql'
-                }
-                step('Flyway migration') {
-                    sh 'echo "Migrate"'
-                }
+                sh 'mysql -uroot < databases/tracker/create_databases.sql'
+                sh 'echo "Migrate"'
             }
         }
         stage('Test') {
