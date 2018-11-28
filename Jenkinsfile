@@ -1,6 +1,4 @@
 #!groovy
-import groovy.json.JsonSlurperClassic
-
 if (env.BRANCH_NAME == 'master') {
     properties([[$class  : 'BuildDiscarderProperty',
                  strategy: [$class               : 'LogRotator',
@@ -33,7 +31,16 @@ pipeline {
                 checkout scm
             }
         }
-
+        stage('Preparation') {
+            steps {
+                step('Create DB') {
+                    sh 'mysql -uroot < databases/tracker/create_databases.sql'
+                }
+                step('Flyway migration') {
+                    sh 'echo "Migrate"'
+                }
+            }
+        }
         stage('Test') {
             steps('Run tests') {
                 sh './gradlew clean build'
