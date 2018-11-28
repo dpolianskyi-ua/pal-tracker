@@ -25,29 +25,29 @@ pipeline {
 
     options {
         skipDefaultCheckout true
-      }
+    }
 
     stages {
-            stage('Checkout') {
-                steps {
-                    checkout scm
-                }
-            }
-
-            stage('Prepare ENV') {
-                steps('Create DB') {
-                    sh 'mysql -uroot < databases/tracker/create_databases.sql'
-                }
-
-                steps('Flyway migration') {
-                    sh 'echo "Migrate"'
-                }
-            }
-
-            stage('Test') {
-                steps('Run tests') {
-                    sh './gradlew clean build'
-                }
+        stage('Checkout') {
+            steps {
+                checkout scm
             }
         }
+
+        stage('Preparation') {
+            steps('Create DB') {
+                sh 'mysql -uroot < databases/tracker/create_databases.sql'
+            }
+
+            steps('Flyway migration') {
+                sh 'echo "Migrate"'
+            }
+        }
+
+        stage('Test') {
+            steps('Run tests') {
+                sh './gradlew clean build'
+            }
+        }
+    }
 }
