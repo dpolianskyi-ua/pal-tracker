@@ -1,6 +1,4 @@
 #!groovy
-import groovy.json.JsonSlurperClassic
-
 if (env.BRANCH_NAME == 'master') {
     properties([[$class  : 'BuildDiscarderProperty',
                  strategy: [$class               : 'LogRotator',
@@ -31,7 +29,10 @@ pipeline {
         stage('Initialize ENV') {
             steps {
                 deleteDir()
-                env.PATH = "/home/jenkins/.gem/bin:${env.PATH}"
+
+                script {
+                    env.PATH = "/home/jenkins/.gem/bin:${env.PATH}"
+                }
             }
         }
 
@@ -39,7 +40,10 @@ pipeline {
             steps {
                 checkout scm
                 getCommitRevision()
-                currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
+
+                script {
+                    currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
+                }
 
                 stash 'sourceCode'
             }
@@ -75,16 +79,18 @@ pipeline {
             steps {
                 deleteDir()
 
-                def envToDeploy = 'none'
+                script {
+                    def envToDeploy = 'none'
 
-                if (env.BRANCH_NAME == 'master') {
-                    envToDeploy = 'SET ENV TO DEPLOY'
-                    stage('Deploying to SET ENV TO DEPLOY') {
-                        deployApps(envToDeploy, 'pal-tracker')
-                        triggerContinuousDeliveryPipeline()
+                    if (env.BRANCH_NAME == 'master') {
+                        envToDeploy = 'SET ENV TO DEPLOY'
+                        stage('Deploying to SET ENV TO DEPLOY') {
+                            deployApps(envToDeploy, 'pal-tracker')
+                            triggerContinuousDeliveryPipeline()
+                        }
+                    } else {
+
                     }
-                } else {
-
                 }
             }
         }
