@@ -36,7 +36,7 @@ pipeline {
 
             stage('Prepare ENV') {
                 steps('Create DB') {
-                    mysql -uroot < databases/tracker/create_databases.sql
+                    sh 'mysql -uroot < databases/tracker/create_databases.sql'
                 }
 
                 steps('Flyway migration') {
