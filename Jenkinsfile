@@ -39,11 +39,11 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                getCommitRevision()
-
-                script {
-                    currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
-                }
+//                getCommitRevision()
+//
+//                script {
+//                    currentBuild.displayName = "#${env.BUILD_NUMBER}-${env.GITHASH.substring(0, 7)}"
+//                }
 
                 stash 'sourceCode'
             }
@@ -71,13 +71,15 @@ pipeline {
             steps {
                 // run goal for testing
 
+                sh "./gradlew build"
+
                 stash 'assembledSourceCodeForTesting'
             }
         }
 
         stage('Deployment') {
             steps {
-                deleteDir()
+//                deleteDir()
 
                 script {
                     def envToDeploy = 'none'
@@ -86,7 +88,7 @@ pipeline {
                         envToDeploy = 'SET ENV TO DEPLOY'
                         stage('Deploying to SET ENV TO DEPLOY') {
                             deployApps(envToDeploy, 'pal-tracker')
-                            triggerContinuousDeliveryPipeline()
+//                            triggerContinuousDeliveryPipeline()
                         }
                     } else {
 
