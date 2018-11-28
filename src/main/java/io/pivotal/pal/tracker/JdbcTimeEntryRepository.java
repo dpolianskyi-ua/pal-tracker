@@ -22,7 +22,6 @@ public class JdbcTimeEntryRepository implements TimeEntryRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcTimeEntryRepository(DataSource dataSource) {
-        //TODO: some check
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
